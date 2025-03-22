@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 )
 
 type User struct {
@@ -23,7 +24,11 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
-
+	//create the table if it does not exist
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name TEXT, email TEXT)")
+	if err != nil {
+		log.Fatal(err)
+	}
 	// create router
 	router := mux.NewRouter()
 	router.HandleFunc("/users", getUsers(db)).Methods("GET")
